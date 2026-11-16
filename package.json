@@ -1,0 +1,33 @@
+{
+  "name": "discord-galacy",
+  "version": "1.0.1",
+  "description": "A rebuild all-in-one Discord.JS wrapper",
+  "keywords": [
+    "Discord",
+    "Wrapper",
+    "Discord",
+    "Wrapper"
+  ],
+  "homepage": "https://github.com/GalacticDocs/Discord-Galacy#readme",
+  "bugs": {
+    "url": "https://github.com/GalacticDocs/Discord-Galacy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GalacticDocs/Discord-Galacy.git"
+  },
+  "license": "MIT",
+  "author": "moony",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "discord.js": "^14.28.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
