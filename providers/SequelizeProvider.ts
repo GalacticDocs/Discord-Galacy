@@ -7,14 +7,14 @@ export default class SequelizeProvider extends Provider {
     private table: ModelStatic<Model<string, Object>>;
     
     /** Column for ID. */
-    private idColumn: string;
+    private readonly idColumn: string;
     
     /** Column for JSON data. */
-    private dataColumn?: string;
+    private readonly dataColumn?: string;
     
     /**
      * @param table - A Sequelize table.
-     * @param option - Options to use.
+     * @param options - Options to use.
      */
     constructor(table: ModelStatic<Model<string, Object>>, options: ProviderOptions = {}) {
         super();
@@ -41,7 +41,7 @@ export default class SequelizeProvider extends Provider {
      */
     override get<T>(id: string, key: string, defaultValue: T): T {
         if (this.items.has(id)) {
-            // @ts-expect-error
+            // @ts-expect-error - Indexing collections in TypeScript is hard to tweak.
             const value = this.items.get(id)[key];
             return value == null ? defaultValue : value;
         }
@@ -49,7 +49,7 @@ export default class SequelizeProvider extends Provider {
         return defaultValue;
     }
 
-    override set(id: string, key: string, value: any): Promise<[Model<string, Object>, boolean | null]> {
+    override set<T>(id: string, key: string, value: T): Promise<[Model<string, Object>, boolean | null]> {
         const data = this.items.get(id) || {};
         // @ts-ignore - Object indexing in TypeScript is hard to tweak.
         data[key] = value;
