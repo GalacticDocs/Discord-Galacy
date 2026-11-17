@@ -39,7 +39,7 @@ export default class Provider {
      * @param key - The key to set.
      * @param value - The value.
      */
-    public set<T>(id: string, key: string, value: T): T {
+    public set<T>(id: string, key: string, value: T) {
         throw new GalacyError("NOT_IMPLEMENTED", this.constructor.name, 'set');
     }
 
@@ -49,7 +49,7 @@ export default class Provider {
      * @param id - ID of entry.
      * @param key - The key to delete.
      */
-    public delete(id: string, key: string): any {
+    public delete(id: string, key: string) {
         throw new GalacyError("NOT_IMPLEMENTED", this.constructor.name, 'delete');
     }
 
@@ -58,7 +58,7 @@ export default class Provider {
      * @abstract
      * @param id - ID of entry.
      */
-    public clear(id: string): any {
+    public clear(id: string) {
         throw new GalacyError("NOT_IMPLEMENTED", this.constructor.name, 'clear');
     }
 }

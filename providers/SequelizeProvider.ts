@@ -25,7 +25,7 @@ export default class SequelizeProvider extends Provider {
     }
 
     /** Initializes the provider */
-    override async init(): Bluebird<void> {
+    override async init(): Promise<void> {
         const rows = await this.table.findAll();
         for (const row of rows) {
             // @ts-ignore
@@ -47,5 +47,57 @@ export default class SequelizeProvider extends Provider {
         }
 
         return defaultValue;
+    }
+
+    override set(id: string, key: string, value: any): Promise<[Model<string, Object>, boolean | null]> {
+        const data = this.items.get(id) || {};
+        // @ts-ignore - Object indexing in TypeScript is hard to tweak.
+        data[key] = value;
+        this.items.set(id, data);
+        
+        if (this.dataColumn) {
+            return this.table.upsert({
+                [this.idColumn]: id,
+                [this.dataColumn]: data
+            });
+        }
+
+        return this.table.upsert({
+            [this.idColumn]: id,
+            [key]: value
+        });
+    }
+
+    /**
+     * Deletes a value.
+     * @param id - ID of entry.
+     * @param key - The key to delete.
+     */
+    override delete(id: string, key: string) {
+        const data = this.items.get(id) || {};
+        // @ts-ignore - Object indexing in TypeScript is hard to tweak.
+        delete data[key];
+
+        if (this.dataColumn) {
+            return this.table.upsert({
+                [this.idColumn]: id,
+                [this.dataColumn]: data
+            });
+        }
+
+        return this.table.upsert({
+            [this.idColumn]: id,
+            [key]: null
+        });
+    }
+
+    /**
+     * Clears an entry.
+     * @param id - ID of entry.
+     */
+    override clear(id: string): Promise<void> {
+        this.items.delete(id);
+        // @ts-ignore - Indexing in sequelize in TypeScript is hard to succeed.
+        return this.table.destroy({ where: { [this.idColumn]: id } });
     }
 }
