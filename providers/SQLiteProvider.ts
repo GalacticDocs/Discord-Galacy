@@ -62,10 +62,11 @@ export default class SQLiteProvider extends Provider {
      * @param key - The key to set.
      * @param value - The value.
      */
-    public set<T>(id: string, key: string, value: T): Promise<Statement> {
+    public async set<T>(id: string, key: string, value: T): Promise<Statement> {
         const data = this.items.get(id) || {};
         const exists = this.items.has(id);
 
+        // @ts-ignore - Object indexing in TypeScript is hard to tweak.
         data[key] = value;
         this.items.set(id, data);
 
@@ -73,18 +74,48 @@ export default class SQLiteProvider extends Provider {
             return this.db.run(exists
                 ? `UPDATE ${this.tableName} SET ${this.dataColumn} = $value WHERE ${this.idColumn} = $id`
                 : `INSERT INTO ${this.tableName} (${this.idColumn}, ${this.dataColumn}) VALUES ($id, $value)`, {
-
+                $id: id,
+                $value: JSON.stringify(data)
             });
         }
+
+        return this.db.run(exists
+            ? `UPDATE ${this.tableName} SET ${key} = $value WHERE ${this.idColumn} = $id`
+            : `INSERT INTO ${this.tableName} (${this.idColumn}, ${key}) VALUES ($id, $value)`, {
+            $id: id,
+            $value: value
+        });
     }
 
+    /**
+     * Deletes a value.
+     * @param id - ID of entry.
+     * @param key - The key to delete.
+     */
+    public delete(id: string, key: string): Promise<Statement> {
+        const data = this.items.get(id) || {};
+        // @ts-ignore - Object indexing in TypeScript is hard to tweak.
+        delete data[key];
 
-    public delete(id: string, key: string) {
-        super.delete(id, key);
+        if (this.dataColumn) {
+            return this.db.run(`UPDATE ${this.tableName} SET ${this.dataColumn} = $value WHERE ${this.idColumn} = $id`, {
+                $id: id,
+                $value: JSON.stringify(data)
+            });
+        }
+
+        return this.db.run(`UPDATE ${this.tableName} SET ${key} = $value WHERE ${this.idColumn} = $id`, {
+            $id: id,
+            $value: null
+        });
     }
 
-
-    public clear(id: string) {
-        super.clear(id);
+    /**
+     * Clears an entry.
+     * @param id - ID of entry.
+     */
+    public clear(id: string): Promise<Statement> {
+        this.items.delete(id);
+        return this.db.run(`DELETE FROM ${this.tableName} WHERE ${this.idColumn} = $id`, { $id: id });
     }
 }
