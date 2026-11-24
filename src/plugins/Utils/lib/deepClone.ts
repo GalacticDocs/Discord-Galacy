@@ -1,10 +1,12 @@
 import { isObject, isPrimitive } from "../index";
 
+type DeepCloneGenerics = object | Record<PropertyKey, unknown> | Map<any, any> | Set<any> | any[];
+
 /**
  * Deep clone a value.
  * @param source The object to clone.
  */
-export function deepClone<T>(source: T) {
+export function deepClone<T extends DeepCloneGenerics = any>(source: T) {
 	// Check if it's a primitive (with exception of function and null, which is typeof object)
 	if (source === null || isPrimitive(source)) return source;
 	if (Array.isArray(source)) {
